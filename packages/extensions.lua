@@ -1,9 +1,4 @@
-local rawtable = table
-local table = setmetatable({}, { __index=rawtable, 
-    __newindex = function(self, key, value)
-        _G.table[key] = value
-    end
-})
+local table = setmetatable({}, { __index=table })
 
 table.split = function(str, sep)
 
@@ -32,23 +27,6 @@ table.unpack = function(...)
     end
     
     return out
-end
-
-table.reverse = function(tbl)
-
-    local out = {}
-    for i = #tbl, 1, -1 do
-        table.insert(out, tbl[i])
-    end
-    return out
-end
-
-table.find = function(tbl, value)
-	for index, v in ipairs(tbl) do
-        if value == v then
-            return index
-        end
-    end
 end
 
 return table

@@ -1,3 +1,4 @@
 @echo off
 MODE 50,35
-luvit main
+lune run main
+pause > nul

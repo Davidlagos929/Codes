@@ -1,5 +1,7 @@
---!nonstrict
-require("../packages/extensions")
+local stdio = require("@lune/stdio")
+local table = require("../packages/extensions.lua")
+
+print(stdio.format(table))
 
 local up_x_1 = {0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20, 27, 28, 29, 36, 37, 38}
 local up_x_2 = {2, 5, 8, 1, 7, 0, 3, 6, 36, 37, 38, 9, 10, 11, 18, 19, 20, 27, 28, 29}
@@ -138,10 +140,28 @@ function rotate(move)
         a[r2[r]] = l[r]
     end
 end
+
+function checkCube()
+    for f = 0, 45, 9 do
+        local res = f + 1
+        local res2 = f + 8
+        for n = res, res2 do
+            if a[f] ~= a[n] then
+               return false
+            end
+        end
+    end
+
+    return true
+end
+
+local function clear()
+    stdio.write("\x1b[2J\x1b[H")
+end
 -----------------------
 
 print("Scrambling...")
-for f = 0, 100 do
+for _ = 0, 100 do
     local move = parse(keys_moves[math.random(1, 12)])[1]
     rotate(move)
 end
@@ -151,7 +171,7 @@ local moves = {}
 
 while true do
 
-    os.execute("cls")
+    clear()
     do
         print("         /\\")
         print("        /" .. a[0] .. a[0] .. "\\")
@@ -183,8 +203,7 @@ while true do
         print("     \\|" .. a[17] .. a[17] .. "||" .. a[24] .. a[24] .. "|/")
         print("      \\" .. a[17] .. a[17] .. "||" .. a[24] .. a[24] .. "/")
         print("       \\" .. a[17] .. "||" .. a[24] .. "/")
-        print("        \\||/")
-        print()
+        print("        \\||\n")
     end
 
     --// Input
@@ -192,8 +211,7 @@ while true do
     if next(moves) then
         table.remove(moves, 1)
     else
-        io.write("Enter command: ")
-        answer = io.read():lower()
+        answer = stdio.prompt('text', "Enter command:"):lower()
         moves = parse(answer)
     end
 
@@ -203,25 +221,21 @@ while true do
     
     local move = moves[1]
     if move then
+    
         rotate(move)
         
-        count = count + 1
-        for f = 0, 45, 9 do
-            res = f + 1
-            res2 = f + 8
-            for n = res, res2 do
-                if a[f] ~= a[n] then
-                    continue
-                end
-            end
+        count += 1
+        
+        if checkCube() then
+            break
         end
-
-        break
     end
 end
 
-os.execute("cls")
-print("You won^^! Congratulations^^!")
-print("You solved the cube in " .. count .. " moves.")
-os.execute("pause > nul")
-os.exit()
+clear()
+if checkCube() then
+    print("You won^^! Congratulations^^!")
+    print("You solved the cube in " .. count .. " moves.")
+else
+    print("You don't complete the cube!")
+end
