@@ -16,10 +16,10 @@ local function colorString(str, color)
 end
 
 local function drawGame()
-    print(("\n"):rep(10))-- cls
+    stdio.write("\x1b[2J\x1b[H")-- cls
     
     print(`You: {colorString(("#"):rep(playerLife), "red")}`, 
-    `AI: {colorString(("#"):rep(aiLife), "red")}`)-- show lifes
+    `AI: {colorString(("#"):rep(aiLife), "red")}`) -- show lifes
     
     print(`\n{log}`) -- show log
     

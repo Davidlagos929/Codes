@@ -19,12 +19,13 @@ function giveCard(to, amount)
 
     amount = amount or 1
     to.cards += amount
-    for i = 1, amount do
+    for _ = 1, amount do
         to.count += math.random(1, 10)
     end
 end
 
 function drawGame()
+    stdio.write("\x1b[2J\x1b[H")
     print(`Your Cards: {player.cards}\t`, `Dealer Cards: {dealer.cards}`)
     print(`Total: {player.count}\n`)
 end
@@ -36,18 +37,14 @@ local function stay()
     local tie = colorString("Tie!", "blue")
 
     local message = ""
-    if dealer.count > 21 then
-        message = win
-    elseif player.count > 21 then
-        message = lose
-    elseif player.count == dealer.count then
-        message = tie
-    elseif player.count > dealer.count then
-        message = win
-    else
-        message = lose
+    if dealer.count > 21 then message = win
+    elseif player.count > 21 then message = lose
+    elseif player.count == dealer.count then message = tie
+    elseif player.count > dealer.count then message = win
+    else message = lose
     end
 
+    stdio.write("\x1b[2J\x1b[H")
     print(`You: {player.count}\t`, `Dealer: {dealer.count}\n`)
     print(message)
 

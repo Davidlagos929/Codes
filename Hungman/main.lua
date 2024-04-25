@@ -12,6 +12,8 @@ local function split(str)
 end
 
 local function drawGame()
+    stdio.write("\x1b[2J\x1b[H")
+    
     print(`life: {life}`)
     print(table.concat(game, " "))
 end
