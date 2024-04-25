@@ -1,6 +1,6 @@
 local orderedTable = {}
 
-function orderedTable.new()
+function orderedTable.new(src: {any}?)
     local mt = { __metatable=nil }
     local this = {}
 
@@ -8,15 +8,15 @@ function orderedTable.new()
 
 	local function getIndex(index)
 
-		for key, v in ipairs(map) do
+		for key, v in map do
             if v[1] == index then
                 return key
             end
         end
 	end
 
-	function mt:__()
-		
+	function mt:__tostring()
+		return "OrderedTable"
 	end
 
     function mt:__index(index)
@@ -25,7 +25,7 @@ function orderedTable.new()
         return element and element[2]
     end
 
-    function mt:__newindex(self, index, value)
+    function mt:__newindex(index, value)
 
 		local key = getIndex(index)
 		if key then
@@ -41,13 +41,9 @@ function orderedTable.new()
 		end
 	end
 
-	function this:sort(callback)
-		
-	end
-
 	function this:every(callback)
 
-		for k,v in this:iter() do
+		for k, v in this:iter() do
 			if not callback(k, v) then
 				return false
 			end
@@ -90,7 +86,7 @@ function orderedTable.new()
 		
 		if not lastIndex then
 			return map[1] and table.unpack(map[1])
-			
+
 		else
 			local index = getIndex(lastIndex)
 			if not index or not map[index + 1] then return end
@@ -99,14 +95,46 @@ function orderedTable.new()
 		end
 	end
 
+	function  this:getKeys()
+		
+		local out = {}
+
+		for k, v in self:iter() do
+			
+			out[k] = v[1]
+		end
+
+		return out
+	end
+
+	function  this:getValues()
+		
+		local out = {}
+
+		for k, v in self:iter() do
+			
+			out[k] = v[2]
+		end
+
+		return out
+	end
+
     function this:iter()
 
         return coroutine.wrap(function()
-            for _, value in ipairs(map) do
+            for i = 1, #map do
+				local value = map[i]
                 coroutine.yield(value[1], value[2])
             end
         end)
     end
+
+	if src then
+		for index, value in src do
+			
+			table.insert(map, {index, value})
+		end
+	end
 
     return setmetatable(this, mt)
 end

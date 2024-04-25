@@ -1,7 +1,6 @@
 local stdio = require("@lune/stdio")
-local table = require("../packages/extensions.lua")
-
-print(stdio.format(table))
+local table = require("../packages/extensions")
+local orderedTable = require("../packages/orderedTable")
 
 local up_x_1 = {0, 1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 18, 19, 20, 27, 28, 29, 36, 37, 38}
 local up_x_2 = {2, 5, 8, 1, 7, 0, 3, 6, 36, 37, 38, 9, 10, 11, 18, 19, 20, 27, 28, 29}
@@ -45,7 +44,7 @@ local keys_moves = {
     "d",
 }
 
-local keys = {
+local keys = orderedTable.new{
     ["l"] = {le_y_1, le_y_2},
     ["r"] = {ri_y_2, ri_y_1},
     ["f"] = {le_z_1, le_z_2},
@@ -72,11 +71,11 @@ local function parse(input)
 	local tokens = table.split(input)
 	
 	local out = {}
-	for k, letter in ipairs(tokens) do
-        
+	for _, letter in ipairs(tokens) do
         local old = out[#out]
 		local move = {}
 
+        letter = letter:lower()
 		if letter == "'" then
 			if old then
 				old.reverse = true
@@ -87,7 +86,7 @@ local function parse(input)
 			end
         elseif letter == "w" then
             if old and not old.key:match("w") then
-				old.key = old.key .. "w"
+				old.key ..= "w"
 			end
 		else
             if keys[letter] then
@@ -100,8 +99,8 @@ local function parse(input)
         end
 	end
 
-    for _, move in ipairs(out) do
-        
+    for _, move in out do
+
         move.rot = keys[move.key]
         if move.reverse then
             move.rot = table.reverse(move.rot)
@@ -126,6 +125,23 @@ for f = 0, 5 do
        local res = f * 9 + x
         a[res] = colors[f]
     end
+end
+
+function generateScramble()
+    
+    local str = ""
+
+    local rotation = {["x"] = true, ["y"] = true, ["z"] = true}
+    local ends = {"", "2", "'"}
+
+    local filtered = keys:filter(function(k) return not rotation[k] end)
+    for _ = 1, 21 do
+        
+        local key = filtered:random()
+        str ..= key:upper() .. ends[math.random(1, #ends)] .. " "
+    end
+
+    return str
 end
 
 function rotate(move)
@@ -160,11 +176,13 @@ local function clear()
 end
 -----------------------
 
-print("Scrambling...")
-for _ = 0, 100 do
-    local move = parse(keys_moves[math.random(1, 12)])[1]
+local scramble = generateScramble()
+for _, move in parse(scramble) do
     rotate(move)
 end
+
+print(scramble)
+stdio.prompt("confirm", "stopped")
 
 local count = 0
 local moves = {}
@@ -204,6 +222,7 @@ while true do
         print("      \\" .. a[17] .. a[17] .. "||" .. a[24] .. a[24] .. "/")
         print("       \\" .. a[17] .. "||" .. a[24] .. "/")
         print("        \\||\n")
+        print(`Scramble: {scramble}`)
     end
 
     --// Input

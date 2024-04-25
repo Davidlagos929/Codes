@@ -17,6 +17,15 @@ table.split = function(str, sep)
     return out
 end
 
+table.reverse = function( tbl )
+    
+    local out = {}
+    for i = #tbl, 1, -1 do
+        table.insert(out, tbl[i])
+    end
+    return out
+end
+
 table.unpack = function(...)
 	local out = {}
     for _, t in ipairs({...}) do
